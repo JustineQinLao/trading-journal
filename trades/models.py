@@ -268,11 +268,6 @@ class Trade(models.Model):
 
         super().save(*args, **kwargs)
     
-    def validate_entry_time(self):
-        """Optional validation - can be disabled for flexible entry"""
-        # Time validation removed to allow trades at any time
-        return True
-    
     def clean(self):
         """Validate the model data before saving."""
         super().clean()
