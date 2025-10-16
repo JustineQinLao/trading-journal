@@ -1,0 +1,105 @@
+{% extends 'trades/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}Edit Trade{% else %}Add Trade{% endif %} - Trading Journal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-{% if form.instance.pk %}pencil{% else %}plus-circle{% endif %}"></i>
+            {% if form.instance.pk %}Edit Trade{% else %}Add New Trade{% endif %}
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% crispy form %}
+                </form>
+            </div>
+        </div>
+
+        <!-- Help Card -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Trading Rules Reminder</h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><strong>Price Levels:</strong> Enter the exact prices for entry, stop loss, and take profit.</li>
+                    <li><strong>Lot Size:</strong> Enter the position size in lots (e.g., 0.01 for micro, 0.10 for mini, 1.00 for standard).</li>
+                    <li><strong>Pip Calculation:</strong> Risk, Reward, and R:R ratio will be calculated and displayed in real-time below the price fields.</li>
+                    <li><strong>P&L:</strong> P&L in USD is calculated automatically when an Exit Price is set, based on pip difference and lot size.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const symbolEl = document.getElementById('id_symbol');
+    const entryPriceEl = document.getElementById('id_entry_price');
+    const stopLossEl = document.getElementById('id_stop_loss');
+    const takeProfitEl = document.getElementById('id_take_profit');
+
+    const displayContainer = document.getElementById('pip-calculator-display');
+    const riskPipsDisplay = document.getElementById('risk-pips-display');
+    const rewardPipsDisplay = document.getElementById('reward-pips-display');
+    const rrRatioDisplay = document.getElementById('rr-ratio-display');
+
+    function getPipSize(symbol) {
+        if (symbol.includes('JPY')) {
+            return 0.01;
+        } else if (symbol === 'XAUUSD' || symbol === 'XAGUSD' || ['NQ', 'ES', 'YM', 'RTY'].includes(symbol)) {
+            return 0.1;
+        } else {
+            return 0.0001; // Standard Forex
+        }
+    }
+
+    function calculateAndDisplayPips() {
+        const symbol = symbolEl.value;
+        const entryPrice = parseFloat(entryPriceEl.value);
+        const stopLoss = parseFloat(stopLossEl.value);
+        const takeProfit = parseFloat(takeProfitEl.value);
+
+        if (!symbol || isNaN(entryPrice) || isNaN(stopLoss) || isNaN(takeProfit)) {
+            displayContainer.style.display = 'none';
+            return;
+        }
+
+        const pipSize = getPipSize(symbol);
+        const riskPrice = Math.abs(entryPrice - stopLoss);
+        const rewardPrice = Math.abs(takeProfit - entryPrice);
+
+        const riskPips = (riskPrice / pipSize).toFixed(1);
+        const rewardPips = (rewardPrice / pipSize).toFixed(1);
+
+        let rrRatio = 'N/A';
+        if (riskPips > 0) {
+            rrRatio = (rewardPips / riskPips).toFixed(2);
+        }
+
+        riskPipsDisplay.textContent = riskPips;
+        rewardPipsDisplay.textContent = rewardPips;
+        rrRatioDisplay.textContent = rrRatio;
+        displayContainer.style.display = 'block';
+    }
+
+    [symbolEl, entryPriceEl, stopLossEl, takeProfitEl].forEach(el => {
+        el.addEventListener('input', calculateAndDisplayPips);
+    });
+
+    // Initial calculation on page load if values are pre-filled (e.g., on edit)
+    calculateAndDisplayPips();
+});
+</script>
+{% endblock %}

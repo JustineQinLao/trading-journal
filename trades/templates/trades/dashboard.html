@@ -1,0 +1,295 @@
+{% extends 'trades/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Trading Journal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </h1>
+        <p class="lead">Overview of your trading performance</p>
+    </div>
+</div>
+
+<!-- Account Balance -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h4 class="mb-2"><i class="bi bi-wallet2"></i> Account Balance</h4>
+                        <h2 class="display-5 {% if account_balance > initial_balance %}text-success{% elif account_balance < initial_balance %}text-danger{% endif %}">
+                            ${{ account_balance|floatformat:2 }}
+                        </h2>
+                        <small class="text-muted">Initial Balance: ${{ initial_balance|floatformat:2 }}</small>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="d-flex flex-column align-items-md-end">
+                            <div class="mb-2">
+                                <span class="badge {% if total_pnl > 0 %}bg-success{% elif total_pnl < 0 %}bg-danger{% else %}bg-secondary{% endif %} fs-6">
+                                    Total P&L: ${{ total_pnl|floatformat:2 }}
+                                </span>
+                            </div>
+                            <div>
+                                {% if account_balance != initial_balance %}
+                                    {% with pnl_percent=total_pnl|floatformat:2|add:"0"|floatformat:0 %}
+                                        {% with percent_change=account_balance|add:"-"|add:initial_balance|floatformat:2 %}
+                                            <small class="text-muted">
+                                                {% if account_balance > initial_balance %}
+                                                    <i class="bi bi-arrow-up-circle-fill text-success"></i> +{{ percent_change }}
+                                                {% elif account_balance < initial_balance %}
+                                                    <i class="bi bi-arrow-down-circle-fill text-danger"></i> {{ percent_change }}
+                                                {% endif %}
+                                            </small>
+                                        {% endwith %}
+                                    {% endwith %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Today's Stats -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="mb-3">Today's Performance</h3>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Trades</h5>
+                <h2 class="display-6">{{ today_trades }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Wins</h5>
+                <h2 class="display-6 text-success">{{ today_wins }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Losses</h5>
+                <h2 class="display-6 text-danger">{{ today_losses }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">P&L</h5>
+                <h2 class="display-6 {% if today_pnl > 0 %}text-success{% elif today_pnl < 0 %}text-danger{% endif %}">
+                    ${{ today_pnl|floatformat:2 }}
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- This Week's Stats -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="mb-3">This Week's Performance</h3>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">Trades</h6>
+                <h3>{{ week_trades }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">Wins</h6>
+                <h3 class="text-success">{{ week_wins }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">Losses</h6>
+                <h3 class="text-danger">{{ week_losses }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">P&L</h6>
+                <h3 class="{% if week_pnl > 0 %}text-success{% elif week_pnl < 0 %}text-danger{% endif %}">
+                    ${{ week_pnl|floatformat:2 }}
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">Win Rate</h6>
+                <h3>{{ week_win_rate }}%</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">Avg R:R</h6>
+                <h3>{{ week_avg_rr }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- All-Time Stats -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="mb-3">All-Time Performance</h3>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card bg-primary text-white">
+            <div class="card-body text-center">
+                <h6 class="card-title">Total Trades</h6>
+                <h3>{{ total_trades }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card bg-success text-white">
+            <div class="card-body text-center">
+                <h6 class="card-title">Wins</h6>
+                <h3>{{ total_wins }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card bg-danger text-white">
+            <div class="card-body text-center">
+                <h6 class="card-title">Losses</h6>
+                <h3>{{ total_losses }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card {% if total_pnl > 0 %}bg-success{% elif total_pnl < 0 %}bg-danger{% else %}bg-secondary{% endif %} text-white">
+            <div class="card-body text-center">
+                <h6 class="card-title">Total P&L</h6>
+                <h3>${{ total_pnl|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card bg-info text-white">
+            <div class="card-body text-center">
+                <h6 class="card-title">Win Rate</h6>
+                <h3>{{ total_win_rate }}%</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stat-card bg-dark text-white">
+            <div class="card-body text-center">
+                <h6 class="card-title">Avg R:R</h6>
+                <h3>{{ total_avg_rr }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Trades -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Recent Trades</h4>
+                <a href="{% url 'trades:trade_create' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle"></i> Add New Trade
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_trades %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Trade #</th>
+                                <th>Symbol</th>
+                                <th>Entry Type</th>
+                                <th>Outcome</th>
+                                <th>P&L</th>
+                                <th>R:R</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trade in recent_trades %}
+                            <tr>
+                                <td><strong>{{ trade.trade_number }}</strong></td>
+                                <td><span class="badge bg-secondary">{{ trade.symbol }}</span></td>
+                                <td>{{ trade.get_entry_type_display }}</td>
+                                <td>
+                                    {% if trade.outcome == 'WINNER' %}
+                                    <span class="badge bg-success">WINNER</span>
+                                    {% elif trade.outcome == 'LOSER' %}
+                                    <span class="badge bg-danger">LOSER</span>
+                                    {% elif trade.outcome == 'SCRATCH' %}
+                                    <span class="badge bg-secondary">SCRATCH</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">OPEN</span>
+                                    {% endif %}
+                                </td>
+                                <td class="{% if trade.profit_loss > 0 %}text-success{% elif trade.profit_loss < 0 %}text-danger{% endif %}">
+                                    ${{ trade.profit_loss|floatformat:2 }}
+                                </td>
+                                <td>{{ trade.risk_reward_ratio }}</td>
+                                <td class="d-flex gap-1">
+                                    <a href="{% url 'trades:trade_detail' trade.pk %}" class="btn btn-sm btn-info" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'trades:trade_update' trade.pk %}" class="btn btn-sm btn-warning" title="Edit Trade">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{% url 'trades:trade_delete' trade.pk %}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this trade? This action cannot be undone.');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Delete Trade">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'trades:trade_list' %}" class="btn btn-outline-primary">
+                        View All Trades <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">No trades yet. Start by adding your first trade!</p>
+                    <a href="{% url 'trades:trade_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add Your First Trade
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

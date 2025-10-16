@@ -1,0 +1,371 @@
+{% extends 'trades/base.html' %}
+{% load static %}
+
+{% block title %}Strategy - Top-Down ICT Model{% endblock %}
+
+{% block extra_css %}
+<style>
+  .strategy-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    margin: 15px 0;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+  }
+  
+  .strategy-image:hover {
+    transform: translateY(-5px);
+  }
+  
+  .chart-box {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+  }
+  
+  .example-scenario {
+    background: #fff;
+    border-left: 4px solid #007bff;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .strategy-image {
+      margin: 10px 0;
+    }
+    
+    .chart-box {
+      padding: 10px;
+      min-height: 200px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col">
+    <h1 class="display-4">
+      <i class="bi bi-diagram-3"></i> Top-Down Strategy (1D → 1H → 5M)
+    </h1>
+    <p class="lead">Practical checklist and visuals derived from your trading notes.</p>
+  </div>
+</div>
+
+<!-- Flow Overview -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center justify-content-between text-center">
+          <div class="p-2 flex-fill">
+            <div class="h5 mb-1">1D - Bias</div>
+            <div class="text-muted">Premium/Discount • FVG • Swing H/L</div>
+          </div>
+          <i class="bi bi-arrow-right h3 m-0"></i>
+          <div class="p-2 flex-fill">
+            <div class="h5 mb-1">1H - Confirm</div>
+            <div class="text-muted">Break in Structure • FVG during BOS</div>
+          </div>
+          <i class="bi bi-arrow-right h3 m-0"></i>
+          <div class="p-2 flex-fill">
+            <div class="h5 mb-1">5M - Execute</div>
+            <div class="text-muted">9:30–11:00 AM EST • Liquidity Sweep • Displacement</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 1: Daily Bias -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-calendar3"></i> Step 1: Daily (1D) - Set Bias</h5>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Mark Fair Value Gaps (3-candle imbalance)</li>
+          <li>Mark swing highs and lows</li>
+          <li>Determine Premium (sell) vs Discount (buy) within range</li>
+        </ul>
+        <div class="alert alert-secondary mb-0">
+          <strong>Rule of Thumb:</strong> Premium → look for Shorts • Discount → look for Longs
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="bi bi-grid-1x2"></i> Visual Example - Daily Chart</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-box">
+          <img src="{% static 'trades/images/strategy/daily-chart.png' %}" alt="Daily Chart - Premium/Discount Zones" class="strategy-image" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 2: 1H Confirmation -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-check2-circle"></i> Step 2: 1H - Confirm Direction</h5>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Find consolidation (2+ times)</li>
+          <li>Look for Break of Structure in bias direction</li>
+          <li>Confirm an FVG formed during the break</li>
+        </ul>
+        <div class="alert alert-warning mb-0">
+          <strong>If unclear:</strong> Don't trade.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-lightning-charge"></i> Visual Example - 1H Chart</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-box">
+          <img src="{% static 'trades/images/strategy/hourly-chart.png' %}" alt="Hourly Chart - Break of Structure" class="strategy-image" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 3: 5M Execution -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-stopwatch"></i> Step 3: 5M - Execute (9:30–11:00 AM EST)</h5>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Wait for liquidity sweep (H/L) or tap into FVG</li>
+          <li>Then displacement creating an FVG in your direction</li>
+          <li>Enter on Inverted FVG or strong impulse away from level</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="bi bi-eye"></i> Visual Example - 5M Entry</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-box">
+          <img src="{% static 'trades/images/strategy/5m-execution.png' %}" alt="5-Minute Chart - Entry Execution" class="strategy-image" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Managing the Trade -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-compass"></i> Managing the Trade — Price Weighting</h5>
+      </div>
+      <div class="card-body">
+        <ol>
+          <li>At first target (prev H/L), move SL to 1 candle behind the swing taken.</li>
+          <li>Trail stop behind subsequent swings to capture runners.</li>
+        </ol>
+        <div class="alert alert-secondary mb-0">
+          <strong>Outcome:</strong> You’ll eventually be stopped out — but capture the big legs.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bonus Confluences -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-stars"></i> Bonus Confluences</h5>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>SMT Divergence (correlated asset fails to make new H/L)</li>
+          <li>Price ran beyond 7:30 AM or Midnight Open</li>
+          <li>Asian/London H/L taken prior to setup</li>
+        </ul>
+        <p class="mb-0"><strong>Risk more with 2+ confluences.</strong> Risk less if aggressive or lacking confirmations.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fail Flip Model -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="bi bi-arrow-repeat"></i> The Fail Flip Model</h5>
+      </div>
+      <div class="card-body">
+        <ol>
+          <li>If higher TF level fails, look for opposite-direction displacement.</li>
+          <li>Flip bias and apply the same 5M rules.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Key Rules -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="bi bi-list-check"></i> Key Rules</h5>
+      </div>
+      <div class="card-body">
+        <ul class="mb-0">
+          <li>Trade only 9:30–11:00 AM EST</li>
+          <li>Stop for the day after losses equal to your average R:R</li>
+          <li>Journal every trade</li>
+          <li>If unclear — do nothing</li>
+          <li>Hold winners longer than you think</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Real Trade Example Scenario -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Real Trade Example: EUR/USD Long Setup</h5>
+      </div>
+      <div class="card-body">
+        <div class="example-scenario">
+          <h6><span class="step-number">1</span> Daily Analysis (1D Chart)</h6>
+          <p class="mb-2">Price is trading at <strong>1.0780</strong> in the <strong style="color: #28a745;">DISCOUNT ZONE</strong> (below 50% EQ of 1.0800)</p>
+          <div class="chart-box mb-3">
+            <img src="{% static 'trades/images/strategy/eurusd-daily.png' %}" alt="EUR/USD Daily Analysis" class="strategy-image" style="max-width: 400px;" loading="lazy">
+          </div>
+          <p><strong>✅ Bias:</strong> Look for LONG opportunities</p>
+        </div>
+
+        <div class="example-scenario">
+          <h6><span class="step-number">2</span> 1H Confirmation</h6>
+          <p class="mb-2">After consolidation, price breaks structure to the upside with a <strong style="color: #17a2b8;">BOS candle</strong> and creates an <strong style="color: #ffc107;">FVG at 1.0775-1.0780</strong></p>
+          <div class="chart-box mb-3">
+            <img src="{% static 'trades/images/strategy/eurusd-hourly.png' %}" alt="EUR/USD Hourly Analysis" class="strategy-image" loading="lazy">
+          </div>
+          <p><strong>✅ Confirmation:</strong> BOS + FVG formed → Ready to execute on 5M</p>
+        </div>
+
+        <div class="example-scenario">
+          <h6><span class="step-number">3</span> 5M Execution (9:45 AM EST)</h6>
+          <p class="mb-2">Price sweeps the previous low at <strong>1.0772</strong>, then shows <strong style="color: #28a745;">displacement</strong> creating a small FVG</p>
+          <div class="chart-box mb-3">
+            <img src="{% static 'trades/images/strategy/eurusd-5m.png' %}" alt="EUR/USD 5-Minute Execution" class="strategy-image" loading="lazy">
+          </div>
+          <p><strong>✅ Entry:</strong> 1.0775 | <strong>SL:</strong> 1.0770 (5 pips) | <strong>TP:</strong> 1.0795 (20 pips) | <strong>R:R:</strong> 1:4</p>
+        </div>
+
+        <div class="example-scenario">
+          <h6><span class="step-number">4</span> Trade Management</h6>
+          <ul class="mb-0">
+            <li>Price hits first target at 1.0790 → Move SL to breakeven (1.0775)</li>
+            <li>Trail stop behind each 5M swing low as price continues up</li>
+            <li>Final exit at 1.0805 when stopped out → <strong style="color: #28a745;">+30 pips profit (1:6 R:R)</strong></li>
+          </ul>
+        </div>
+
+        <div class="alert alert-success mt-3 mb-0">
+          <strong>🎯 Result:</strong> Winning trade following the complete Top-Down methodology. The key was patience waiting for all confirmations: Daily bias → 1H BOS+FVG → 5M liquidity sweep + displacement → Entry in FVG.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Reference Checklist -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> Pre-Trade Checklist</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <h6 class="text-primary">Daily (1D)</h6>
+            <ul class="list-unstyled">
+              <li>☐ Premium or Discount?</li>
+              <li>☐ FVG marked?</li>
+              <li>☐ Swing H/L identified?</li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h6 class="text-info">Hourly (1H)</h6>
+            <ul class="list-unstyled">
+              <li>☐ Consolidation present?</li>
+              <li>☐ BOS in bias direction?</li>
+              <li>☐ FVG during BOS?</li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h6 class="text-success">5-Minute (5M)</h6>
+            <ul class="list-unstyled">
+              <li>☐ Time: 9:30-11:00 AM EST?</li>
+              <li>☐ Liquidity sweep occurred?</li>
+              <li>☐ Displacement + FVG?</li>
+              <li>☐ Entry at FVG boundary?</li>
+            </ul>
+          </div>
+        </div>
+        <hr>
+        <p class="mb-0 text-center"><strong>⚠️ If ANY checkbox is unchecked → DO NOT TRADE</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

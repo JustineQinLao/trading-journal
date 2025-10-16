@@ -1,0 +1,188 @@
+{% extends 'trades/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Trade List - Trading Journal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-list-ul"></i> All Trades
+        </h1>
+    </div>
+</div>
+
+<!-- Filter Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-funnel"></i> Filter Trades
+            <button class="btn btn-sm btn-outline-secondary float-end" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                Toggle Filters
+            </button>
+        </h5>
+    </div>
+    <div class="collapse show" id="filterCollapse">
+        <div class="card-body">
+            <form method="get" action="{% url 'trades:trade_list' %}">
+                {% crispy filter_form %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">Total Trades</h6>
+                <h3>{{ filtered_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">Total P&L</h6>
+                <h3 class="{% if filtered_pnl > 0 %}text-success{% elif filtered_pnl < 0 %}text-danger{% endif %}">
+                    ${{ filtered_pnl|floatformat:2 }}
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">Win Rate</h6>
+                <h3>{{ filtered_win_rate }}%</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h6 class="card-title text-muted">Avg R:R</h6>
+                <h3>{{ filtered_avg_rr }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trades Table -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Trades</h5>
+        <a href="{% url 'trades:trade_create' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle"></i> Add Trade
+        </a>
+    </div>
+    <div class="card-body">
+        {% if trades %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Trade #</th>
+                        <th>Date/Time</th>
+                        <th>Symbol</th>
+                        <th>Direction</th>
+                        <th>Entry Type</th>
+                        <th>Outcome</th>
+                        <th>P&L</th>
+                        <th>R:R</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trade in trades %}
+                    <tr>
+                        <td><strong>{{ trade.trade_number }}</strong></td>
+                        <td>{{ trade.timestamp|date:"M d, Y H:i" }}</td>
+                        <td><span class="badge bg-secondary">{{ trade.symbol }}</span></td>
+                        <td>
+                            {% if trade.direction == 'LONG' %}
+                            <span class="badge bg-success">LONG</span>
+                            {% else %}
+                            <span class="badge bg-danger">SHORT</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ trade.get_entry_type_display }}</td>
+                        <td>
+                            {% if trade.outcome == 'WINNER' %}
+                            <span class="badge bg-success">WINNER</span>
+                            {% elif trade.outcome == 'LOSER' %}
+                            <span class="badge bg-danger">LOSER</span>
+                            {% elif trade.outcome == 'SCRATCH' %}
+                            <span class="badge bg-secondary">SCRATCH</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">OPEN</span>
+                            {% endif %}
+                        </td>
+                        <td class="{% if trade.profit_loss > 0 %}text-success{% elif trade.profit_loss < 0 %}text-danger{% endif %}">
+                            <strong>${{ trade.profit_loss|floatformat:2 }}</strong>
+                        </td>
+                        <td>{{ trade.risk_reward_ratio }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{% url 'trades:trade_detail' trade.pk %}" class="btn btn-info" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'trades:trade_update' trade.pk %}" class="btn btn-warning" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'trades:trade_delete' trade.pk %}" class="btn btn-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Last</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+            <p class="text-muted mt-3">No trades found matching your filters.</p>
+            <a href="{% url 'trades:trade_list' %}" class="btn btn-secondary me-2">Clear Filters</a>
+            <a href="{% url 'trades:trade_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Trade
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends 'trades/base.html' %}
+{% load static %}
+
+{% block title %}Trade {{ trade.trade_number }} - Trading Journal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-file-text"></i> Trade {{ trade.trade_number }}
+        </h1>
+        <p class="lead">
+            {{ trade.timestamp|date:"F d, Y - h:i A" }}
+            {% if trade.outcome == 'WINNER' %}
+            <span class="badge bg-success fs-5">WINNER</span>
+            {% elif trade.outcome == 'LOSER' %}
+            <span class="badge bg-danger fs-5">LOSER</span>
+            {% elif trade.outcome == 'SCRATCH' %}
+            <span class="badge bg-secondary fs-5">SCRATCH</span>
+            {% else %}
+            <span class="badge bg-warning text-dark fs-5">OPEN</span>
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'trades:trade_update' trade.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a href="{% url 'trades:trade_delete' trade.pk %}" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+        <a href="{% url 'trades:trade_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Trade Information -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Trade Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Trade Number:</th>
+                        <td><strong>{{ trade.trade_number }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Symbol:</th>
+                        <td><span class="badge bg-secondary fs-6">{{ trade.symbol }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Direction:</th>
+                        <td>
+                            {% if trade.direction == 'LONG' %}
+                            <span class="badge bg-success fs-6">LONG</span>
+                            {% else %}
+                            <span class="badge bg-danger fs-6">SHORT</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Entry Type:</th>
+                        <td>{{ trade.get_entry_type_display }}</td>
+                    </tr>
+                    <tr>
+                        <th>Timeframe Analysis:</th>
+                        <td>{{ trade.timeframe_analysis }}</td>
+                    </tr>
+                    <tr>
+                        <th>Confidence Level:</th>
+                        <td>
+                            {% if trade.confidence_level == 'HIGH' %}
+                            <span class="badge bg-success">HIGH</span>
+                            {% elif trade.confidence_level == 'MEDIUM' %}
+                            <span class="badge bg-warning text-dark">MEDIUM</span>
+                            {% else %}
+                            <span class="badge bg-secondary">LOW</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Position Size:</th>
+                        <td>{{ trade.lot_size }} lot{{ trade.lot_size|pluralize }}</td>
+                    </tr>
+                    <tr>
+                        <th>Account Capital:</th>
+                        <td><strong>${{ trade.capital|floatformat:2 }}</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Levels -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Price Levels</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Entry Price:</th>
+                        <td><strong>${{ trade.entry_price }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Stop Loss:</th>
+                        <td class="text-danger"><strong>${{ trade.stop_loss }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Take Profit:</th>
+                        <td class="text-success"><strong>${{ trade.take_profit }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Exit Price:</th>
+                        <td>
+                            {% if trade.exit_price %}
+                            <strong>${{ trade.exit_price }}</strong>
+                            {% else %}
+                            <span class="text-muted">Not set</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr class="border-top">
+                        <th>Risk (Pips):</th>
+                        <td>{{ trade.risk_pips }} pips</td>
+                    </tr>
+                    <tr>
+                        <th>Reward (Pips):</th>
+                        <td>{{ trade.reward_pips }} pips</td>
+                    </tr>
+                    <tr>
+                        <th>R:R Ratio:</th>
+                        <td>
+                            <h4 class="mb-0">{{ trade.risk_reward_ratio }}:1</h4>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header {% if trade.outcome == 'WINNER' %}bg-success{% elif trade.outcome == 'LOSER' %}bg-danger{% elif trade.outcome == 'SCRATCH' %}bg-secondary{% else %}bg-info{% endif %} text-white">
+                <h5 class="mb-0"><i class="bi bi-trophy"></i> Results</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Outcome:</th>
+                        <td>
+                            {% if trade.outcome == 'WINNER' %}
+                            <span class="badge bg-success fs-6">WINNER</span>
+                            {% elif trade.outcome == 'LOSER' %}
+                            <span class="badge bg-danger fs-6">LOSER</span>
+                            {% elif trade.outcome == 'SCRATCH' %}
+                            <span class="badge bg-secondary fs-6">SCRATCH</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark fs-6">OPEN</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Profit/Loss (Pips):</th>
+                        <td>
+                            <h5 class="mb-0 {% if trade.pnl_pips > 0 %}text-success{% elif trade.pnl_pips < 0 %}text-danger{% endif %}">
+                                {{ trade.pnl_pips }} pips
+                            </h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Profit/Loss (USD):</th>
+                        <td>
+                            <h3 class="mb-0 {% if trade.profit_loss > 0 %}text-success{% elif trade.profit_loss < 0 %}text-danger{% endif %}">
+                                ${{ trade.profit_loss|floatformat:2 }}
+                            </h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Risk/Reward Ratio:</th>
+                        <td>
+                            <h4 class="mb-0">{{ trade.risk_reward_ratio }}:1</h4>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-image"></i> Screenshot</h5>
+            </div>
+            <div class="card-body">
+                {% if trade.screenshot %}
+                <img src="{{ trade.screenshot.url }}" alt="Trade Screenshot" class="img-fluid rounded">
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-image" style="font-size: 3rem;"></i>
+                    <p class="mt-3">No screenshot uploaded</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-journal-text"></i> Notes</h5>
+            </div>
+            <div class="card-body">
+                {% if trade.notes %}
+                <p class="mb-0" style="white-space: pre-wrap;">{{ trade.notes }}</p>
+                {% else %}
+                <p class="text-muted mb-0">No notes added for this trade.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Timestamps -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <small class="text-muted">
+                    <i class="bi bi-clock"></i> Created: {{ trade.created_at|date:"F d, Y - h:i A" }} |
+                    Last Updated: {{ trade.updated_at|date:"F d, Y - h:i A" }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
