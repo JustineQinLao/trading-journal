@@ -109,7 +109,7 @@ class Trade(models.Model):
 
     # 4. Position
     lot_size = models.DecimalField(max_digits=5, decimal_places=2, help_text="Position size in lots (e.g., 0.01, 1.0)")
-    capital = models.DecimalField(max_digits=12, decimal_places=2, help_text="Account capital/balance at time of trade (USD)")
+    capital = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('100.00'), help_text="Account capital/balance at time of trade (USD)")
     confidence_level = models.CharField(max_length=10, choices=CONFIDENCE_CHOICES)
 
     # 5. Results (auto-calculated)

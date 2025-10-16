@@ -9,7 +9,6 @@ A Django-based trading journal application for tracking ICT (Inner Circle Trader
 - **Advanced Filtering**: Filter trades by date, symbol, outcome, entry type, and direction
 - **Detailed Statistics**: Performance breakdown by entry type, symbol, confidence level, and direction
 - **Auto-Calculations**: Automatic calculation of Risk/Reward ratios and P&L
-- **Time Validation**: Enforces trading window (9:30-11:00 AM EST)
 - **Price Validation**: Validates stop loss and take profit placement based on direction
 - **Screenshot Upload**: Attach trade setup screenshots
 - **Admin Panel**: Full admin interface with CSV export functionality
