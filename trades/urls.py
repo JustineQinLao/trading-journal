@@ -11,6 +11,4 @@ urlpatterns = [
     path('trades/<int:pk>/edit/', views.TradeUpdateView.as_view(), name='trade_update'),
     path('trades/<int:pk>/delete/', views.TradeDeleteView.as_view(), name='trade_delete'),
     path('statistics/', views.StatisticsView.as_view(), name='statistics'),
-    path('strategy/', views.StrategyView.as_view(), name='strategy'),
-    path('tutorial/', views.TutorialView.as_view(), name='tutorial'),
 ]

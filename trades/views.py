@@ -68,27 +68,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class StrategyView(LoginRequiredMixin, TemplateView):
-    """Displays the trading strategy with clean visualization"""
-    template_name = 'trades/strategy.html'
-    login_url = '/admin/login/'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Static content is in the template; context can be extended later if needed
-        return context
-
-
-class TutorialView(LoginRequiredMixin, TemplateView):
-    """Comprehensive tutorial with sidebar navigation"""
-    template_name = 'trades/tutorial.html'
-    login_url = '/admin/login/'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
-
 class TradeListView(LoginRequiredMixin, ListView):
     """List view with filtering and pagination"""
     model = Trade
